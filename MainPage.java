@@ -1,7 +1,5 @@
 package CasinoGame;
 
-import java.util.Scanner;
-
 public class MainPage {
 
 	public static void main(String[] args) {
@@ -14,8 +12,11 @@ public class MainPage {
 		System.out.println("");
 		
 		Design casinoGame = new Design();
-		casinoGame.gamesMenu();
+		BlackJack blackJack = new BlackJack();
 		
+		if(casinoGame.gamesMenu() == 1) {
+			blackJack.kartyaOsztas();
+		}
 		
 		
 		
