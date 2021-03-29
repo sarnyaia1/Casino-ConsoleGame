@@ -4,23 +4,22 @@ import java.util.Scanner;
 
 public class Bank {
 	
-	public double beszalloOsszeg() {
-		Scanner bet = new Scanner(System.in);
-		double beszallo;
+	public int beszalloOsszeg() {	
+		Scanner bet = new Scanner(System.in);	//Valami√©rt nem tudom lez√°rni scannereket...
+		int beszallo;
 		
 		do {
-			System.out.println("Add meg mekkorra ˆsszeggel szeretnÈl besz·llni (min. 5$ - max. 1000$)");
-			beszallo = bet.nextDouble();
-		} while(beszallo < 5 || beszallo > 1000);
+			System.out.println("Add meg mekkorra √∂sszeggel szeretn√©l besz√°llni (min. 50$ - max. 1000$)");
+			beszallo = bet.nextInt();
+		} while(beszallo < 50 || beszallo > 1000);	// Esetleg ki√≠rni, hogy t√∫l nagy/ t√∫l kicsi az √∂sszeg
 		
-		
-		//System.out.println("A besz·llÛ ˆsszeg: " + beszallo);
 		return beszallo;
 	}
 	
-	public String toString(double dealer){
-		System.out.println("");
-		return "A rendelkezÈsedre ·llÛ pÈnzˆsszeg: " + dealer + "$";
+	/*  
+	public String toString(int dealer){
+		return "\nA rendelkez√©sedre √°ll√≥ p√©nz√∂sszeg: " + dealer + "$\n";		//Lecser√©ltem m√°sik m√≥dszerre
 	}
-
+	*/
+	
 }
