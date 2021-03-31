@@ -15,6 +15,10 @@ public class Player {
 	public int getplayerBalance() { // getter, lekérjük a játékos zsetonjait
 		return this.playerBalance;
 	}
+	
+	public void addBalance(int amount) { // nem setter, megadjuk, hogy mennyivel növeljük, vagy csökkentjük a zsetonok értékeit
+		this.playerBalance += amount;
+	}
 
 	public void setplayerBalance(int playerBalance) { // setter, megadjuk, hogy mennyivel növeljük, vagy csökkentjük a zsetonok mennyiségét
 		this.playerBalance = playerBalance;

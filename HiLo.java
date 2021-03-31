@@ -21,16 +21,16 @@ public class HiLo extends Bank {
 		while(tet==0){
 			card = new HiLoCard();
 			System.out.println("Jelenlegi kártyád: "+card.getSuit()+" "+card.getValue());
-			System.out.println("Jelenlegi zsetonod: "+ this.player.getBalance());
+			System.out.println("Jelenlegi zsetonod: "+ this.player.getplayerBalance());
 			System.out.println("Kérek egy tétet!");
 			tet = be.nextInt();
-			if (tet<0 || tet>this.player.getBalance()) {
+			if (tet<0 || tet>this.player.getplayerBalance()) {
 				tet = 0;
 				System.out.println("Ez nem lesz elég..");
 			}
 		}
 		this.player.addBalance(-tet);
-		System.out.println("Jelenlegi zsetonod: "+this.player.getBalance());
+		System.out.println("Jelenlegi zsetonod: "+this.player.getplayerBalance());
 		while(true){
 			System.out.println("Jelenlegi kártyád: "+card.getSuit()+" "+card.getValue());
 			System.out.println("Jelenlegi tét: "+ tet);
