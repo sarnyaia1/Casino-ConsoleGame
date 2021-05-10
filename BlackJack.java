@@ -1,167 +1,202 @@
-package CasinoGame;
-
-import java.util.Scanner;
-
-import CasinoGame.Card;
-import CasinoGame.Game;
-
 import java.util.*;
 
-public class BlackJack extends Game { // az absztrakt Game osztÃ¡lyunkat terjetszjÃ¼k ki extends-el, Ã¶rÃ¶klÃ©s, a Game osztÃ¡lybÃ³l egy Ãºj osztÃ¡ly szÃ¡rmaztatÃ¡sa
-	private Player computer; // player tÃ­pusÃº osztÃ¡ly, aki ellen jÃ¡tszunk
-	private Player player; // mi
-	private boolean isStopped = false; // vÃ¡ltozÃ³, amiben tÃ¡roljuk, hogy megÃ¡lltunk-e
-	private FrenchCardDeck deck; // franciakÃ¡rtya pakli vÃ¡ltozÃ³ja
-	private ArrayList<Card> playerCardList = new ArrayList<Card>(); // a mi paklink, ami a kezÃ¼nkben van
-	private ArrayList<Card> computerCardList = new ArrayList<Card>(); // osztÃ³ paklija
+public class BlackJack extends Game { // az absztrakt Game osztályunkat terjetszjük ki extends-el, öröklés, a Game õsosztályból egy új osztály származtatása
+        private Player computer; // player típusú osztó, aki ellen játszunk
+        private Player player; // a játékos
+        private boolean isStopped = false; // változó, amiben tároljuk, hogy megálltunk-e
+        private FrenchCardDeck deck; // franciakártya pakli változója
+        private ArrayList<Card> playerCardList = new ArrayList<Card>(); // a mi paklink, ami a kezünkben van
+        private ArrayList<Card> computerCardList = new ArrayList<Card>(); // osztó paklija
+        private boolean rulesDone = false;
+        
+        public BlackJack(Player player) { // csak a mi player objektumunkat várja, mert az osztót a játék generálja
+                this.player = player;
+                this.computer = new Player("Osztó", 50);
+                this.deck = new FrenchCardDeck(); // itt hozzunk létre az új franciakártya pakli objektumunkat a játékhoz
+                Collections.shuffle(this.deck.cards);
+                
+                System.out.println("  \n"
+                                + "             **************************************\n"
+                                + "             *                                    *\n"
+                                + "             *     Üdv a Black Jack játékban!     *\n"
+                                + "             *                                    *\n"
+                                + "             **************************************\n");
+                //System.out.println(" ");
+        }
+        
+        public void run() { // run metódus elindítja a játékot
+                int result; // gyõztes állapot tárolása
+                int multiplier = 2; // gyõzelem esetén a szorzó
+                
+                
+                if(!this.rulesDone && this.readGameRules()) {
+                        System.out.println("  A Black Jack lényege, hogy 21 pontot szerezz a kártyáidból. \n"
+                                                         + " - Az Osztó ellen játszol.\n" 
+                                                         + " - Akinek a kártyáinak az összege 21, vagy közelebb van a 21-hez, az nyer.\n"
+                                                         + " - 2 kártyát kapsz a játék elején, utána te döntöd el, hogy kérsz-e még, vagy megállsz.\n"
+                                                         + " - Azonos pontszám esetén, vagy ha mindketten besokalltok, döntetlen az eredmény, a téted visszakapod.\n"
+                                                         + " - Gyõzelem esetén a téted kétszeresét nyered vissza, Black Jack (21) esetén a téted háromszorosát.\n"
+                                                         + " - Vereség esetén elveszted a téted.\n"
+                                                         + " \n"
+                                                         + "  Sok sikert a játékhoz!");
+                        Scanner in = new Scanner(System.in);
+                        System.out.println("");
+                        System.out.println("Nyomj entert, ha kezdõdhet a játék!");
+                        in.nextLine();
+                        this.rulesDone = true;
+                }
+                
+                this.getStake(this.player); // tét bekérése
+                
+                System.out.println("  1. kártyád osztása...\r"); // helyére ugrik be a kártya
+                this.delay(2000);
+                this.handOut(this.player); //1. lap kiosztása
+                this.deck.printCards(this.playerCardList);
+                //System.out.println("Az 1. lapod: " + newCard.color+ ", " + newCard.type);
+                System.out.println("  2. kártyád osztása...\r");
+                this.delay(2000);
+                this.handOut(this.player); //2. lap kiosztása a játékosnak
+                //System.out.println("A 2. lapod: " + newCard.color + ", " + newCard.type);
+                System.out.println("A lapjaid:");
+                this.deck.printCards(this.playerCardList);
 
-	public BlackJack(Player player) { // csak a mi player objektumunkat vÃ¡rja, mert az osztÃ³t a jÃ¡tÃ©k generÃ¡lja
-		this.player = player;
-		this.computer = new Player("PC OsztÃ³");
-		this.deck = new FrenchCardDeck(); // itt hozzunk lÃ©tre az Ãºj franciakÃ¡rtya pakli objektumunkat a jÃ¡tÃ©khoz
-		
-		/*
-		System.out.println("  \n"
-				+ "		**************************************\n"
-				+ "		*                                    *\n"
-				+ "		*                                    *\n"
-				+ "		*   Ãœdv a BlackJack jÃ¡tÃ©kban!!!!!    *\n"
-				+ "		*                                    *\n"
-				+ "		*                                    *\n"
-				+ "		**************************************\n"); //Ã¼dvÃ¶zlÅ‘ felÃ¼let*/
-	
-	}
-	
-	/*
-	public void cardHand(){
-		char[] kartyaTipusok = {'\u2663', '\u2660', '\u2665', '\u2666'}; // Sorban: treff, pikk, kÅ‘r, kÃ¡rÃ³
-		char[] kartyaPakli = {'2', '3', '4' , '5', '6', '7', '8', '9', 'X', 'J', 'Q', 'K', 'A'}; //X = 10 Ã©s Ã­gy csak karakter tÃ¶mb kell
-		int szam1 = (int)((Math.random() * (10 - 0)) + 0);
-		int szam2 = (int)((Math.random() * (10 - 0)) + 0);
-		int szam3 = (int)((Math.random() * (10 - 0)) + 0);
-		int symbol1 = (int)((Math.random() * (4 - 0)) + 0);
-		int symbol2 = (int)((Math.random() * (4 - 0)) + 0);
-		int symbol3 = (int)((Math.random() * (4 - 0)) + 0);
-		
-		
-		System.out.println("----------     ----------\n"
-				+ "|        |     |        |\n"
-				+ "|   " + kartyaPakli[szam1] + "    |     |   " + kartyaPakli[szam2] + "    |\n"
-				+ "|   " + kartyaTipusok[symbol1] + "    |     |   " + kartyaTipusok[symbol2] + "    |\n"
-				+ "|   " + kartyaPakli[szam1] + "    |     |   " + kartyaPakli[szam2] + "    |\n"
-				+ "|        |     |        |\n"
-				+ "----------     ----------");
+                //osztó 2 kártyájának kiosztása:
+                this.handOut(this.computer); // 1. lap kiosztása az osztónak
+                this.handOut(this.computer); //2. lap az osztónak
+                
+                //System.out.println("");
+                System.out.println("A kártyáid összértéke: " + this.getCardsValue(this.player)); // getterrel lekérjük a lapok összértékét
+                //System.out.println("");
+        
+                while (!isStopped && this.getCardsValue(this.player) < 21 || this.getCardsValue(this.computer) <= 17) { // addig megyünk még vége nincs a játéknak
+                        if ( !isStopped && this.getCardsValue(this.player) < 21) {
+                                int dontes;
+                                do { 
+                                        Scanner in = new Scanner(System.in);
+                                 
+                                        System.out.println("  \n"
+                                                        + "             **************************************\n"
+                                                        + "             *       Kérsz még vagy megállsz?     *\n"
+                                                        + "             *             1. Kérek még!          *\n"
+                                                        + "             *             2. Megállok!           *\n"
+                                                        + "             **************************************\n");
+                                        dontes = in.nextInt();
+                                } while(dontes < 1 || dontes > 2); // amég nem 1-est vagy 2-est ír, addig kérjük be a számot
+                                System.out.println("");
+                                
+                                if (dontes == 2) { // ha 2-est választunk, akkor megáll a játék
+                                        this.isStopped = true;
+                                } else {
+                                        System.out.println("  Következõ kártyád osztása...\r");
+                                        this.delay(2000);
+                                        this.handOut(this.player); // következõ lap kiosztása
+                                        
+                                }
+                                System.out.println("A kártyáid: "); 
+                                this.deck.printCards(this.playerCardList); // kártyakiíratás
+                        
+                                if (this.getCardsValue(this.player) == 21) {
+                                        System.out.println("  \n"
+                                                        + "             **************************************\n"
+                                                        + "             *        ! B L A C K  J A C K !      *\n"
+                                                        + "             **************************************\n");
+                                }
+                                
+                                if(this.getCardsValue(this.player) < 21 && !isStopped) {
+                                        System.out.println("A jelenlegi pontszámod : " + this.getCardsValue(this.player)); // getter az összpontszám lekérdezésére
+                                }
+                        }
+                        
+                        if (this.getCardsValue(this.computer) <= 17) { //az osztó addig kap kártyát, amég a lapjainak összértéke 17 vagy annál kisebb
+                                this.handOut(this.computer);
+                        }
+                } 
+                
+                // addig megy a játék amég meg nem állunk, vagy amég el nem érjük a legalább 21-et
+                System.out.println("Az összpontszámod: " + this.getCardsValue(this.player));
+                System.out.println("");
+                System.out.println("  Az osztó kártyáinak felfedése...\r");
+                this.delay(3000);
+                System.out.println("");
+                System.out.println("Az osztó kártyái: ");
+                this.deck.printCards(this.computerCardList);
+                if (this.getCardsValue(this.computer) == 21) {
+                        System.out.println("  \n"
+                                        + "             **************************************\n"
+                                        + "             *        ! B L A C K  J A C K !      *\n"
+                                        + "             **************************************\n");
+                }
+                System.out.println("Az Osztó összpontszáma: " + this.getCardsValue(this.computer));
+                
+                //döntetlen: ha a 2 pontszám megegyezik, vagy mindketten besokalltunk
+                if(this.getCardsValue(this.player) == this.getCardsValue(this.computer)
+                                || (this.getCardsValue(this.player)> 21 && this.getCardsValue(this.computer) > 21)) {
+                        result = 3; // Game osztály handleStake metódusának átadott érték
+                }
+                else if ((this.getCardsValue(this.computer) > 21 && this.getCardsValue(this.player) <= 21) 
+                        || (this.getCardsValue(this.player) <= 21 && 21 - this.getCardsValue(this.player) < 21 - this.getCardsValue(this.computer))) {
+                        // ha az osztó lapjainak értéke több, mint 21, és nekünk nincs több, mint 21, akkor nyertünk
+                        //ha kevesebbünk van, mint 21, és közelebb vagyunk a 21-hez mint az osztó, akkor is nyertünk
+                        if (this.getCardsValue(this.player) == 21) {
+                                multiplier = 3;
+                        }
+                        System.out.println(" ");
+                        result = 1;
+                } else { // minden más esetben vesztünk
+                        System.out.println(" ");
+                        result = 2;
+                }
+                
+                
+                this.handleStake(this.player, result, multiplier); // tét kezelése, hozzáadódik, vagy levonódik a zsetonjainkból
+                this.delay(2000); // késleltetés
+                boolean playAgain = this.playAgain(this.player); //játékostól bekérni, hogy akar-e újrajátszani
 
-	
-		System.out.println("----------     ----------\n"
-				+ "|        |     |        |\n"
-				+ "|   " + kartyaPakli[szam3] + "    |     |        |\n"
-				+ "|   " + kartyaTipusok[symbol3] + "    |     |        |\n"
-				+ "|   " + kartyaPakli[szam3] + "    |     |        |\n"
-				+ "|        |     |        |\n"
-				+ "----------     ----------");
-	}
-	*/
-	
-	public void run() { // run metÃ³dus elindÃ­tja a jÃ¡tokot
-		Card newCard; // a newCard vÃ¡ltozÃ³ az Ãºjonnan kiosztott kÃ¡rtyÃ¡t tÃ¡rolja
-
-		newCard = this.handOut(this.player); //1. lap kiosztÃ¡sa
-		System.out.println("Az 1. lapod: " + newCard.color+ ", " + newCard.type);
-		newCard = this.handOut(this.player); //2. lap kiosztï¿½sa a jï¿½tï¿½kosnak
-		System.out.println("A 2. lapod: " + newCard.color + ", " + newCard.type);
-
-		//osztï¿½ 2 kï¿½rtyï¿½jï¿½nak kiosztï¿½sa:
-		newCard = this.handOut(this.computer); // 1. lap kiosztï¿½sa az osztï¿½nak
-		newCard = this.handOut(this.computer); //2. lap az osztï¿½nak
-		
-		System.out.println("- - - - - - - - - - - - - - - - -");
-		System.out.println("A kÃ¡rtyÃ¡id Ã¶sszÃ©rtÃ©ke: " + this.getCardsValue(this.player)); // getterrel lekï¿½rjï¿½k a lapok ï¿½sszï¿½rtï¿½kï¿½t
-		System.out.println(" - - - - - - - - - - - - - - - - -");
-
-		do { // addig megyÃ¼nk mÃ©g vÃ©ge nincs a jÃ¡tÃ©knak
-			Scanner in = new Scanner(System.in);
-			System.out.println("KÃ©rsz mÃ©g vagy megÃ¡llsz?");
-			System.out.println("   1. KÃ©rek mÃ©g!");
-			System.out.println("   2. MegÃ¡llok!");
-			int dontes = in.nextInt();
-			System.out.println(" - - - - - - - - - - - - - - - -");
-			
-			if (dontes == 2) { // ha 2-est vï¿½lasztunk, akkor megï¿½ll a jï¿½tï¿½k
-				this.isStopped = true;
-			} else {
-				newCard = this.handOut(this.player); // kï¿½vetkezï¿½ lap kiosztï¿½sa
-				System.out.println("A kÃ¶vetkezÅ‘ lapod: " + newCard.color + ", " + newCard.type);
-			}
-			
-			if (this.getCardsValue(this.computer) <= 17) { //az osztï¿½ addig kap kï¿½rtyï¿½t, amï¿½g a lapjainak ï¿½sszï¿½rtï¿½ke 17 vagy annï¿½l kisebb
-				newCard = this.handOut(this.computer);
-			}
-
-			System.out.println(" - - - - - - - - - - - - - - - -");
-			System.out.println("Az eddigi kÃ¡rtyÃ¡id: " + this.getCards()); //getter a kï¿½rtyï¿½k lekï¿½rdezï¿½sï¿½re
-			System.out.println("Az Ã¶sszpontszÃ¡mod: " + this.getCardsValue(this.player)); // getter az ï¿½sszpontszï¿½m lekï¿½rdezï¿½sï¿½re
-			
-			
-			
-		} while (!isStopped && this.getCardsValue(this.player) < 21); 
-		// addig megy a jï¿½tï¿½k amï¿½g meg nem ï¿½llunk, vagy amï¿½g el nem ï¿½rjï¿½k a legalï¿½bb 21-et
-		System.out.println(" - - - - - - - - - - - - - - - -");
-		System.out.println("Az OsztÃ³ Ã¶sszpontszÃ¡ma: " + this.getCardsValue(this.computer));
-		
-		if ((this.getCardsValue(this.computer) > 21 && this.getCardsValue(this.player) <= 21) 
-			|| (this.getCardsValue(this.player) <= 21 && 21 - this.getCardsValue(this.player) < 21 - this.getCardsValue(this.computer))) {
-			// ha az osztï¿½ lapjainak ï¿½rtï¿½ke tï¿½bb, mint 21, ï¿½s nekï¿½nk nincs tï¿½bb, mint 21, akkor nyertï¿½nk
-			//ha kevesebbï¿½nk van, mint 21, ï¿½s kï¿½zelebb vagyunk a 21-hez mint az osztï¿½, akkor is nyertï¿½nk
-			//-dï¿½ntetlen mï¿½g hiï¿½nyzik (kell bele?)
-			System.out.println("GratulÃ¡lok, nyertÃ©l!");
-		} else { // minden mï¿½s esetben vesztï¿½nk
-			System.out.println("Sajnos vesztettÃ©l! :(");
-		}
-	}
-	
-	public Card handOut(Player player) { // kï¿½vetkezï¿½ kï¿½rtya kiosztï¿½sa metï¿½dus
-		//random indexet generï¿½lunk 0 ï¿½s a pakliban lï¿½vï¿½ kï¿½rtyï¿½k szï¿½ma kï¿½zï¿½tt (52 lapos a pakli kezdetben)
-		int randomIndex = 0 + (int)(Math.random() * (this.deck.cards.size() - 0));
-		Card newCard = this.deck.cards.get(randomIndex); //random indexï¿½ kï¿½rtyï¿½t kivï¿½lasztjuk a paklibï¿½l
-		this.deck.cards.remove(randomIndex); // a kiosztott lapot kiveszzï¿½k a paklibï¿½l, ï¿½gy mindig 1-gyel kevesebb lesz benne
-		Player playerName = player;
-	
-		if (playerName == computer) { // ha osztï¿½ a olayerï¿½nk, akkor az ï¿½ paklijï¿½hoz adjunk hozzï¿½
-			this.computerCardList.add(newCard);
-		} else { // mï¿½s esetben a sajï¿½tunkhoz
-			this.playerCardList.add(newCard);		
-		}
-		
-		return newCard; // ï¿½jonnan kiosztott kï¿½rtyï¿½val tï¿½rï¿½nk vissza
-	}
-	
-	private int getCardsValue(Player player) { // aktuï¿½lis jï¿½tï¿½kos kezï¿½ben lï¿½vï¿½ kï¿½rtyï¿½k ï¿½sszegï¿½vel tï¿½rï¿½nk vissza
-		ArrayList<Card> cardsDeck; 
-		Player playerName = player;
-		if (playerName == computer) { // ha osztï¿½ a jï¿½tï¿½kos, akkor az ï¿½ paklijï¿½t vesszï¿½k alapul
-			cardsDeck = this.computerCardList;
-		}else { // a jï¿½tï¿½kos paklijï¿½t vesszï¿½k alapul
-			cardsDeck = this.playerCardList;
-		}
-		
-		int sum = 0; // a sum tï¿½rolja a pakli kï¿½rtyï¿½inak az ï¿½sszegï¿½t
-		for(int i=0; i<cardsDeck.size(); i++) { // vï¿½gig megyï¿½nk a paklin
-			sum += cardsDeck.get(i).getValue(); // minden egyes kï¿½rtyï¿½nak hozzï¿½adjuk az ï¿½rtï¿½kï¿½t a sum-hoz
-		}
-		
-		return sum; // visszatï¿½rï¿½nk az ï¿½sszpontszï¿½mmal
-	}
-	
-	private String getCards() {	// a mi kï¿½rtyï¿½inknak a kiï¿½ratï¿½sï¿½hoz kell a metï¿½dus	
-		String cards = "";
-		for(int i=0; i<this.playerCardList.size(); i++) { // vï¿½gigmegyï¿½nk az ï¿½sszes kï¿½rtyï¿½nkon, ami a kezï¿½nkben van
-			cards += this.playerCardList.get(i).color + " " + this.playerCardList.get(i).type; // szï¿½n ï¿½s szï¿½m kiï¿½ratï¿½shoz kell a getter
-			if(i < this.playerCardList.size() - 1) { // ha nem az utolsï¿½ kï¿½rtya a paklinkban,
-				cards += ", "; //  akkor mï¿½g egy vesszï¿½t rakunk a vï¿½gï¿½re
-			}
-		}
-		
-		return cards; // visszatï¿½r a kiï¿½rï¿½shoz szï¿½ksï¿½ges szï¿½n ï¿½s szï¿½m kombinï¿½ciï¿½kkal
-	}
+                if (playAgain) { // ha újrajátszás van, akkor a resetGame metódust hívja, illetve a run()-t
+                        this.resetGame();
+                        this.run();
+                }
+        }
+        
+        public void handOut(Player player) { // következõ kártya kiosztása metódus
+                Card newCard = this.deck.cards.get(0);
+                this.deck.cards.remove(0); // a kiosztott lapot kiveszzük a pakliból, így mindig 1-gyel kevesebb lesz benne
+        
+                if (player.name=="Osztó") { // ha osztó a playerünk, akkor az õ paklijához adjunk hozzá
+                        this.computerCardList.add(newCard);
+                } else { // más esetben a sajátunkhoz
+                        this.playerCardList.add(newCard);               
+                }
+        }
+        private int getCardsValue(Player player) { // aktuális játékos kezében lévõ kártyák összegével térünk vissza
+                ArrayList<Card> cardsDeck; 
+                if (player.name == "Osztó") { // ha osztó a játékos, akkor az õ pakliját vesszük alapul
+                        cardsDeck = this.computerCardList;
+                }else { // a játékos pakliját vesszük alapul
+                        cardsDeck = this.playerCardList;
+                }
+                
+                int sum = 0; // a sum tárolja a pakli kártyáinak az összegét
+                for(int i=0; i<cardsDeck.size(); i++) { // végig megyünk a paklin
+                        sum += cardsDeck.get(i).getValue(); // minden egyes kártyának hozzáadjuk az értékét a sum-hoz
+                }
+                
+                return sum; // visszatérünk az összpontszámmal
+        }
+        
+        private void resetGame() { // minden ami a játékhoz kell alaphelyzetbe állítása
+                this.deck = new FrenchCardDeck();
+                Collections.shuffle(this.deck.cards);
+                this.playerCardList.clear();
+                this.computerCardList.clear();
+                this.isStopped = false;
+        }
+        
+        private void delay(int delayInMs) { // késleltetés
+                try {
+                        Thread.sleep(delayInMs);
+                } catch (InterruptedException e) {
+                        System.out.println("Nem sikerült a késleltetés.");
+                }
+        }
 }

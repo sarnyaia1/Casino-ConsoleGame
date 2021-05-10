@@ -1,18 +1,18 @@
-package CasinoGame;
 
-public class GameFactory { // az azonos√≠t√≥ sz√°m alapj√°n legy√°rt egy Game t√≠pus√∫ objektumot
-	
+public class GameFactory { // az azonosÌtÛ sz·m alapj·n legy·rt egy Game tÌpus˙ j·tÈkobjektumot
 	public static Game getGame(int gameNumber, Player player) {
-		if (gameNumber == 1) { 				//Blackjack
+		if (gameNumber == 1) { 
 			return new BlackJack(player);
-		} else if (gameNumber == 2) {		//Rulett
-			//return new Roulette(player);
-		} else if (gameNumber == 3) {		//F√©lkar√∫ rabl√≥
-			//return SlotMachine(player);
-		} else {							//Als√≥-Fels≈ë
-			//return HiLo(player);
+		} else if(gameNumber == 2) {
+		        return new Rulett(player);
+		} else if(gameNumber == 3) {
+			return new Felkaru(player);
+		} else if (gameNumber == 4) { 
+			return new HiLo(player);
+		} else {
+			return null;
 		}
 		
-		return null;
+		
 	}
 }

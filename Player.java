@@ -1,26 +1,22 @@
-package CasinoGame;
 
 public class Player {
-	
-	private String playerName;
-	private int playerBalance;		// zsetonok mennyisÃ©ge
-	//public String password;		// ha meglesz a fÃ¡jl beolvasÃ¡s akkor mÃ©g lesz egy private jelszÃ³
-	
-	public Player(String playerName) { // konstruktor, megadott nÃ©vvel inicializÃ¡ljuk, + a megadott pÃ©nzÃ¶sszeg
-		this.playerName = playerName;
-		//this.playerBalance = playerBalance;
-	}
-	
+        public String name;
+        private int balance; // zsetonok értéke, mennyisége
+        
+        
+        public Player(String name, int balance) { // konstruktor, megadott névvel inicializáljuk, + fix 50 zseton kezdõérték
+                this.name = name;
+                this.balance = balance;
+        }
 
-	public int getplayerBalance() { // getter, lekÃ©rjÃ¼k a jÃ¡tÃ©kos zsetonjait
-		return this.playerBalance;
-	}
-	
-	public void addBalance(int amount) { // nem setter, megadjuk, hogy mennyivel nÃ¶veljÃ¼k, vagy csÃ¶kkentjÃ¼k a zsetonok Ã©rtÃ©keit
-		this.playerBalance += amount;
-	}
+        public int getBalance() { // getter, lekérjük a játékos zsetonjait
+                return this.balance;
+        }
 
-	public void setplayerBalance(int playerBalance) { // setter, megadjuk, hogy mennyivel nÃ¶veljÃ¼k, vagy csÃ¶kkentjÃ¼k a zsetonok mennyisÃ©gÃ©t
-		this.playerBalance = playerBalance;
-	}
+        public void addBalance(int amount) { // megadjuk, hogy mennyivel növeljük, vagy csökkentjük a zsetonok értékeit
+                this.balance += amount;
+        }
+        public void setBalance(int amount) { // setter, beállítjuk hogy mennyi a zsetonértéke
+                this.balance = amount;
+        }
 }
