@@ -1,7 +1,7 @@
 # CasinoGame
 
-A simple Casino console game in Java
+Together with my classmates, we created a project work, a Java Casino console game
 
-### 4 games
+## First look
 
 ![This is an image](screenshot.png)
